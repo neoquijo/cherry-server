@@ -27,7 +27,6 @@ export class UsersService {
           ],
         })
         .lean();
-      console.log(result);
       return result;
     } catch (error) {
       console.log(error);

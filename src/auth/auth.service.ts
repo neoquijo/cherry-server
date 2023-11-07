@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as firebase from 'firebase-admin';
@@ -7,6 +8,9 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ICreateUserDto } from 'src/users/models/dto/createUser.dto';
 import { IUser } from 'src/users/models/users.schema';
+import { BusinessOwnersService } from 'src/businessOwners/businessOwners.service';
+import { v4 } from 'uuid';
+import { OrganizationService } from 'src/organizations/organization.service';
 
 const account: firebase.ServiceAccount = {
   clientEmail: credentials.client_email,
@@ -19,6 +23,8 @@ export class AuthService {
   private readonly app: firebase.app.App;
   constructor(
     private readonly users: UsersService,
+    private readonly businessOwners: BusinessOwnersService,
+    private readonly organizations: OrganizationService,
     private readonly jwt: JwtService,
   ) {
     this.app = firebase.initializeApp({
@@ -38,7 +44,7 @@ export class AuthService {
             user: existing,
           };
         }
-        const user: IUser = await this.users.createNew({
+        const user = await this.users.createNew({
           id: gUser.uid,
           email: gUser.email,
           displayName: gUser.displayName,
@@ -49,12 +55,81 @@ export class AuthService {
         });
         return {
           token: await this.createToken(user),
-          user,
+          //@ts-ignore
+          user: user._doc,
         };
       }
     } catch (error) {
       console.log(error);
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async createUser(data) {
+    try {
+      const response = await this.users.createNew({
+        id: v4(),
+        email: data.email,
+        displayName: data.name,
+        authProvider: 'local',
+        avatar: data.photoURL,
+        emailVerified: false,
+        login: data.email,
+        password: bcrypt.hashSync(data.password, 10),
+      });
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.CONFLICT, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async createBusinessUser(data) {
+    try {
+      const hash = await bcrypt.hash(data.password, 10);
+      const user = await this.businessOwners.create({
+        id: v4(),
+        email: data.email,
+        displayName: data.name,
+        authProvider: 'local',
+        emailVerified: false,
+        login: data.email,
+        phoneNumber: data.phoneNumber,
+        password: hash,
+      });
+      const { password, ...userData } = user;
+      return {
+        //@ts-ignore
+        token: await this.createToken(userData._doc),
+        //@ts-ignore
+        user: userData._doc,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.CONFLICT, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async firstLoginCompleteData(data, user) {
+    const { organization, businessOwner } = data;
+    try {
+      const createdOrganization = await this.organizations.create(
+        organization,
+        user,
+      );
+      const createdBusinessOwner = await this.businessOwners.completeFirstLogin(
+        businessOwner,
+        user,
+        createdOrganization,
+      );
+      console.log(createdBusinessOwner);
+      return createdBusinessOwner;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_MODIFIED, {
         cause: error.message,
       });
     }
@@ -78,6 +153,53 @@ export class AuthService {
         const { password, ...user } = candidate;
         return this.createToken(user);
       }
+    }
+  }
+
+  async businessLogin({ login, password }) {
+    try {
+      const candidate = await this.businessOwners.getBusinessOwnerById(login);
+      if (!candidate) throw new Error('Такого пользователя не существует!');
+      else {
+        const correct = await bcrypt.compare(password, candidate.password);
+        if (!correct) throw new Error('Не верно указан пароль!');
+        else {
+          const { password, ...user } = candidate;
+          return {
+            user,
+            token: await this.createToken(user),
+          };
+        }
+      }
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async verifyBusinessToken(token: string): Promise<any> {
+    try {
+      const correct = await this.jwt.verify(token);
+      if (correct) {
+        const decoded = this.jwt.decode(token);
+        if (typeof decoded === 'object') {
+          const user: IUser = decoded as IUser;
+          const exist = await this.businessOwners.getBusinessOwnerById(user.id);
+          if (!exist) throw new Error('token validation failed');
+          const { password, ...userData } = exist;
+          return userData;
+        }
+      } else
+        throw new HttpException(
+          'Ошибка валидации токена',
+          HttpStatus.UNAUTHORIZED,
+        );
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST, {
+        cause: error.message,
+      });
     }
   }
 

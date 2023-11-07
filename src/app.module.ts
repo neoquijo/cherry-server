@@ -10,8 +10,8 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { GoodsModule } from './goods/goods.module';
 import { MessagesModule } from './messages/messages.module';
 import { OffersModule } from './offers/offers.module';
-import { PointsOfSaleModule } from './points-of-sale/points-of-sale.module';
-import { BusinessOwnersModule } from './business-owners/business-owners.module';
+import { PointsOfSaleModule } from './pointsOfSale/pointsOfSale.module';
+import { BusinessOwnersModule } from './businessOwners/businessOwners.module';
 import { ManagersModule } from './managers/managers.module';
 
 @Module({
@@ -19,7 +19,8 @@ import { ManagersModule } from './managers/managers.module';
     ConfigModule.forRoot(),
     AuthModule,
     MongooseModule.forRoot(
-      'mongodb+srv://admin:admin@cherry-server.l2c5jct.mongodb.net/?retryWrites=true&w=majority',
+      'mongodb://root:root@localhost',
+      // 'mongodb+srv://admin:admin@cherry-server.l2c5jct.mongodb.net/?retryWrites=true&w=majority',
     ),
     UsersModule,
     OrganizationsModule,
