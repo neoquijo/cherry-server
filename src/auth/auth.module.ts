@@ -9,6 +9,7 @@ import { OrganizationsModule } from 'src/organizations/organizations.module';
 @Module({
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [AuthService],
   imports: [
     UsersModule,
     BusinessOwnersModule,
@@ -21,4 +22,4 @@ import { OrganizationsModule } from 'src/organizations/organizations.module';
     }),
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

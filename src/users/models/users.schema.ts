@@ -3,15 +3,15 @@ import { Types } from 'mongoose';
 
 @Schema()
 export class Users {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   id: string;
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   login: string;
   @Prop()
   password: string;
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string;
-  @Prop()
+  @Prop({ required: false, unique: true })
   phone: string;
   @Prop()
   avatar: string;

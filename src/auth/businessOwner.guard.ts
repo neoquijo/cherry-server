@@ -9,15 +9,24 @@ import {
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { BusinessOwnersService } from 'src/businessOwners/businessOwners.service';
+
+interface adminRequest extends Request {
+  user: unknown;
+  organizations: unknown;
+}
 
 @Injectable()
 export class OwnerGuard implements CanActivate {
-  constructor(private auth: AuthService) {}
+  constructor(
+    private auth: AuthService,
+    private owners: BusinessOwnersService,
+  ) {}
   // @ts-ignore
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean | Observable<boolean>> {
-    const request: Request = context.switchToHttp().getRequest();
+    const request: adminRequest = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
     try {
       console.log('inside guard');
@@ -26,10 +35,9 @@ export class OwnerGuard implements CanActivate {
         throw new Error('No token provided');
       } else {
         const verified = await this.auth.verifyBusinessToken(token);
-        console.log(verified);
         if (verified) {
-          // @ts-ignore
           request.user = verified;
+          request.organizations = verified.organizations;
           return true;
         } else return false;
       }

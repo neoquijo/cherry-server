@@ -7,9 +7,9 @@ export class Offer {
   @Prop()
   id: string;
   @Prop()
-  title: ITranslatableText;
+  title: string;
   @Prop()
-  description: ITranslatableText;
+  description: string;
   @Prop()
   coverImage: string;
   @Prop()
@@ -22,14 +22,26 @@ export class Offer {
   currentActivations: number;
   @Prop({ type: Types.ObjectId, ref: 'organization' })
   organization: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'pos' })
+  pointOfSale: Types.ObjectId;
   @Prop()
   startsAt: number;
   @Prop()
   endsAt: number;
   @Prop({ default: true })
   active: boolean;
+  @Prop({ type: Number || String })
+  price: number | string;
   @Prop()
-  price: number;
+  minPrice: number;
+  @Prop()
+  maxPrice: number;
+  @Prop()
+  verifyed: boolean;
+  @Prop()
+  options: [];
+  @Prop()
+  lang: string;
 }
 
-export const OferSchema = SchemaFactory.createForClass(Offer);
+export const OfferSchema = SchemaFactory.createForClass(Offer);

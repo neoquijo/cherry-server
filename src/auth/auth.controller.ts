@@ -4,13 +4,23 @@ import { AuthService } from './auth.service';
 import { OwnerGuard } from './businessOwner.guard';
 import { User } from './owner.decorator';
 import { OrganizationService } from 'src/organizations/organization.service';
+import { BusinessOwnersService } from 'src/businessOwners/businessOwners.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly organizations: OrganizationService,
+    private readonly owners: BusinessOwnersService,
   ) { }
+
+  @UseGuards(OwnerGuard)
+  @Post('/rejectBusinessData')
+  async rejectBusinessData(@User() user) {
+
+    const response = await this.owners.deleteOwner(user._id)
+    return response
+  }
 
   @Post('/firebase/google')
   create(@Body('token') token: string) {

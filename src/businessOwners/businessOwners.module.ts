@@ -17,4 +17,4 @@ import { BusinesOwnersController } from './businessOwners.controller';
   exports: [BusinessOwnersService],
   controllers: [BusinesOwnersController],
 })
-export class BusinessOwnersModule { }
+export class BusinessOwnersModule {}
