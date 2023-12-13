@@ -17,11 +17,8 @@ interface adminRequest extends Request {
 }
 
 @Injectable()
-export class OwnerGuard implements CanActivate {
-  constructor(
-    private auth: AuthService,
-    private owners: BusinessOwnersService,
-  ) {}
+export class UserGuard implements CanActivate {
+  constructor(private auth: AuthService) { }
   // @ts-ignore
   async canActivate(
     context: ExecutionContext,
@@ -32,7 +29,7 @@ export class OwnerGuard implements CanActivate {
       if (!token) {
         throw new Error('No token provided');
       } else {
-        const verified = await this.auth.verifyBusinessToken(token);
+        const verified = await this.auth.verifyToken(token);
         if (verified) {
           request.user = verified;
           request.organizations = verified.organizations;

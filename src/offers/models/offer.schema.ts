@@ -1,47 +1,67 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { ITranslatableText } from 'src/types/ITranslation';
+import { v4 } from 'uuid';
 
 @Schema()
 export class Offer {
-  @Prop()
+  @Prop({ default: () => v4() })
   id: string;
   @Prop()
   title: string;
   @Prop()
+  caption?: string;
+  @Prop()
+  lang: string;
+  @Prop()
+  offerValue: number;
+  @Prop({ default: 0 })
+  score: number;
+  @Prop()
   description: string;
   @Prop()
-  coverImage: string;
+  startsAt: number;
+  @Prop({ default: 0 })
+  totalSold: number;
+  @Prop()
+  endsAt: number;
+  @Prop()
+  category: string;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'pos' }] })
+  avaliableIn: [Types.ObjectId];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'pos' }] })
+  homeDeliveryIn: [Types.ObjectId];
+  @Prop()
+  qty: number;
+  @Prop()
+  unlimited: boolean;
+  @Prop()
+  offerPrice: number;
+  @Prop()
+  initialPrice: number;
   @Prop()
   images: [string];
   @Prop()
-  content: string;
+  mainImage: string;
   @Prop()
-  maxActivations: number;
+  pageContent: [unknown];
   @Prop()
   currentActivations: number;
   @Prop({ type: Types.ObjectId, ref: 'organization' })
   organization: Types.ObjectId;
-  @Prop({ type: Types.ObjectId, ref: 'pos' })
-  pointOfSale: Types.ObjectId;
-  @Prop()
-  startsAt: number;
-  @Prop()
-  endsAt: number;
   @Prop({ default: true })
   active: boolean;
+  @Prop({ type: Types.ObjectId, ref: 'businessowners' })
+  owner: Types.ObjectId;
   @Prop({ type: Number || String })
   price: number | string;
   @Prop()
   minPrice: number;
   @Prop()
   maxPrice: number;
-  @Prop()
+  @Prop({ default: false })
   verifyed: boolean;
   @Prop()
-  options: [];
-  @Prop()
-  lang: string;
+  buyOptions: [unknown];
 }
 
 export const OfferSchema = SchemaFactory.createForClass(Offer);

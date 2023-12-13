@@ -8,7 +8,6 @@ export const tempProfileImageStorage = diskStorage({
     cb(null, 'uploads/tempProfileUploads');
   },
   filename: (req, file, cb) => {
-    console.log(file);
     cb(null, v4() + '.' + file.mimetype.split('/')[1]);
   },
 });
@@ -32,14 +31,12 @@ export class Images5mbOnlyPipe implements PipeTransform {
       if (value['images']) {
         // If value is an array, validate each file in the array
         for (const file of value.images) {
-          console.log(file.originalname);
           this.validateFile(file, maxFileSize);
         }
       } else {
         this.validateFile(value, maxFileSize);
       }
     } catch (error) {
-      console.log(error)
       if (value['images']) {
         // If value is an array, validate each file in the array
         for (const file of value.images) {

@@ -11,7 +11,7 @@ export class Users {
   password: string;
   @Prop({ required: true, unique: true })
   email: string;
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   phone: string;
   @Prop()
   avatar: string;
@@ -25,6 +25,8 @@ export class Users {
   authProvider: string;
   @Prop()
   emailVerified: boolean;
+  @Prop({ type: Types.ObjectId, ref: 'cart' })
+  cart: Types.ObjectId;
 }
 
 export interface IUser {

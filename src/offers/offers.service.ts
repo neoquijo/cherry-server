@@ -1,13 +1,108 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Offer } from './models/offer.schema';
-import { Model } from 'mongoose';
-import { IOffer } from './models/offer.type';
+import { Model, Types } from 'mongoose';
 import { FileUtils } from 'src/Utils/FileUtils';
+import { OfferDTO } from './models/offer.dto';
+import { OfferCats } from './models/offerCats.schema';
 
 @Injectable()
 export class OffersService {
-  constructor(@InjectModel(Offer.name) private readonly offer: Model<Offer>) {}
+  constructor(
+    @InjectModel(Offer.name) private readonly offer: Model<Offer>,
+    @InjectModel(OfferCats.name) private readonly cats: Model<OfferCats>,
+  ) { }
+  i = 0;
+  async getAllActiveOffers() {
+    try {
+      const now = new Date().getTime();
+      const response = await this.offer.find({
+        $and: [{ startsAt: { $lt: now } }, { endsAt: { $gt: now } }],
+      });
+      return response;
+    } catch (error) {
+      throw new HttpException('Error getting offers', HttpStatus.NO_CONTENT, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async getOfferByRegexp(id: string, lang: string) {
+    try {
+      const offer = await this.offer
+        .findOne({ id: { $regex: id }, lang })
+        .lean();
+      return offer;
+    } catch (error) {
+      throw new HttpException('Error getting offer', HttpStatus.BAD_REQUEST, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async getAllActiveOffersByCat(cat: string) {
+    try {
+      const now = new Date().getTime();
+      const response = await this.offer.find({
+        $and: [
+          { startsAt: { $lt: now } },
+          { endsAt: { $gt: now } },
+          { category: { $eq: cat } },
+        ],
+      });
+      return response;
+    } catch (error) {
+      throw new HttpException('Error getting offers', HttpStatus.NO_CONTENT, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async getCats(key?: string) {
+    try {
+      const aggregationPipeline = [
+        ...(key ? [{ $match: { key: key } }] : []),
+        {
+          $lookup: {
+            from: 'offers',
+            let: { catKey: '$key' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$category', '$$catKey'] },
+                      { $lt: ['$startsAt', new Date().getTime()] },
+                      { $gt: ['$endsAt', new Date().getTime()] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'offersCount',
+          },
+        },
+        {
+          $addFields: {
+            count: { $size: '$offersCount' },
+          },
+        },
+        {
+          $project: {
+            offersCount: 0,
+          },
+        },
+      ];
+
+      const response = await this.cats.aggregate(aggregationPipeline);
+      return response;
+    } catch (error) {
+      throw new HttpException('Cats fetching error', HttpStatus.NO_CONTENT, {
+        cause: error.message,
+      });
+    }
+  }
+
   async getOffersByOrganization(id) {
     try {
       const response = await this.offer.find({ organization: id }).lean();
@@ -19,28 +114,22 @@ export class OffersService {
     }
   }
 
-  async create(offer: IOffer) {
+  async create(offer: OfferDTO, ownerId: string, organization?: string) {
     try {
-      const response = await this.offer.create(offer);
+      const response = await this.offer.create({
+        ...offer,
+        owner: new Types.ObjectId(ownerId),
+        offerValue: (
+          100 -
+          (Number(offer.offerPrice) * 100) / Number(offer.initialPrice)
+        ).toFixed(0),
+        organization: organization
+          ? new Types.ObjectId(organization)
+          : undefined,
+      });
       return response;
     } catch (error) {
-      throw new HttpException('Ofers fetching error', HttpStatus.NO_CONTENT, {
-        cause: error.message,
-      });
-    }
-  }
-
-  async createBulk(offers: IOffer[]) {
-    try {
-      const operations = offers.map((offer) => ({
-        insertOne: {
-          document: offer,
-        },
-      }));
-      const response = await this.offer.bulkWrite(operations);
-      return response.insertedIds;
-    } catch (error) {
-      throw new HttpException('Ofers fetching error', HttpStatus.NO_CONTENT, {
+      throw new HttpException('Offer creation error', HttpStatus.NO_CONTENT, {
         cause: error.message,
       });
     }
@@ -60,10 +149,9 @@ export class OffersService {
     }
   }
 
-  uploadOfferImages = (files, dirname) => {
-    FileUtils.createTempUploadFolder('uploads/offers/' + dirname);
+  uploadOfferImages = async (files, dirname) => {
+    await FileUtils.createTempUploadFolder('uploads/offers/' + dirname);
     files.images.map((image) => {
-      console.log(image);
       FileUtils.moveFile(
         image.path,
         'uploads/offers/' + dirname + '/' + image.filename,

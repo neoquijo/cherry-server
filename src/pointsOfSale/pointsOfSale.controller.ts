@@ -59,7 +59,6 @@ export class PointsOfSaleAdminController {
   )
   @UsePipes(Images5mbOnlyPipe)
   profileUrlTemp(@UploadedFile() image: MulterFile) {
-    console.log(image);
     return { image: image.filename };
   }
 }

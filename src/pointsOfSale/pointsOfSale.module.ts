@@ -20,5 +20,6 @@ import { PosAdress, PosAdressSchema } from './models/posadress.schema';
       { name: PosAdress.name, schema: PosAdressSchema },
     ]),
   ],
+  exports: [PointsOfSaleService],
 })
-export class PointsOfSaleModule { }
+export class PointsOfSaleModule {}

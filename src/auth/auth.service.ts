@@ -60,7 +60,6 @@ export class AuthService {
         };
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED, {
         cause: error.message,
       });
@@ -126,7 +125,6 @@ export class AuthService {
         user,
         createdOrganization,
       );
-      console.log(createdBusinessOwner);
       return createdBusinessOwner;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.NOT_MODIFIED, {

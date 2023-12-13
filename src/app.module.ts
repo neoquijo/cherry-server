@@ -28,10 +28,19 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads', 'offers'),
       serveRoot: '/u/offers',
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads', 'offerCards'),
+      serveRoot: '/img/offers',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads', 'covers'),
+      serveRoot: '/img/covers',
+    }),
     ConfigModule.forRoot(),
     forwardRef(() => AuthModule),
     MongooseModule.forRoot(
       'mongodb://root:root@localhost',
+      { dbName: 'cupiponDev' },
       // 'mongodb+srv://admin:admin@cherry-server.l2c5jct.mongodb.net/?retryWrites=true&w=majority',
     ),
     UsersModule,

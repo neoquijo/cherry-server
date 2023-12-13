@@ -18,6 +18,8 @@ export class POS {
   goods: [Types.ObjectId];
   @Prop({ type: [{ type: Types.ObjectId, ref: 'offers' }] })
   offers: [Types.ObjectId];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'offers' }] })
+  homeDeliveryOffers: [Types.ObjectId];
   @Prop({ type: [{ type: Types.ObjectId, ref: 'reviews' }] })
   reviews: [Types.ObjectId];
   @Prop()

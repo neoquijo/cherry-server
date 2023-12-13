@@ -28,7 +28,6 @@ export class ImageHandlerService {
         .toFile(`tempProfileUploads/${newFilename}.${filename.split('.')[1]}`);
       return newFilename;
     } catch (error) {
-      console.log(error);
       throw new HttpException(
         'error processing file',
         HttpStatus.UNPROCESSABLE_ENTITY,

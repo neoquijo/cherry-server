@@ -1,10 +1,10 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
   Get,
   Post,
   Req,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -13,32 +13,55 @@ import {
 import { OwnerGuard } from 'src/auth/businessOwner.guard';
 import { Organizatios, User } from 'src/auth/owner.decorator';
 import { OffersService } from './offers.service';
-import { IOffer } from './models/offer.type';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   Images5mbOnlyPipe,
   createStorage,
 } from 'src/image-handler/multerStorages';
 import { MulterFile } from 'src/image-handler/types';
+import { OfferDTO } from './models/offer.dto';
+import { PointsOfSaleService } from 'src/pointsOfSale/pointsOfSale.service';
+import { FileUtils } from 'src/Utils/FileUtils';
 
 @Controller('/admin/offers')
 @UseGuards(OwnerGuard)
 export class AdminOffersController {
-  constructor(private readonly offerService: OffersService) { }
+  constructor(
+    private readonly offerService: OffersService,
+    private readonly posService: PointsOfSaleService,
+  ) { }
 
   @Get('/')
-  getAll(@Organizatios() organizations) {
-    return this.offerService.getOffersByOrganization(organizations[0]._id);
+  async getAll(@Organizatios() organizations) {
+    return await this.offerService.getOffersByOrganization(
+      organizations[0]._id,
+    );
   }
 
   @Post('/create')
-  createOfferBulk(offeers: IOffer[]) {
-    offeers.forEach((offer) => {
-      this.offerService.create(offer);
-    });
+  async createOffer(@Body() offer: OfferDTO, @User() user) {
+    const createdOffer = await this.offerService.create(
+      offer,
+      user._id,
+      user.organizations[0]._id,
+    );
+    this.posService.addHomeDeliveryToPos(
+      createdOffer._id,
+      createdOffer.homeDeliveryIn,
+    );
+    await FileUtils.moveDir(
+      'uploads/offers/' + user.id.slice(-10),
+      'uploads/offerCards/' + createdOffer.id.slice(-10),
+    );
+    await FileUtils.copyFile(
+      'uploads/offerCards/' +
+      createdOffer.id.slice(-10) +
+      '/' +
+      createdOffer.mainImage,
+      'uploads/covers/' + createdOffer.mainImage,
+    );
+    this.posService.addOfferToPos(createdOffer._id, createdOffer.avaliableIn);
+    return createdOffer;
   }
 
   @Get('/tempUploads')
@@ -64,7 +87,6 @@ export class AdminOffersController {
     }),
   )
   offerUpload(@UploadedFiles() images: MulterFile, @Req() request) {
-    console.log(request.user.id);
     this.offerService.uploadOfferImages(images, request.user.id.slice(-10));
     return { images: images };
   }

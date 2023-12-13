@@ -1,4 +1,5 @@
 import { Dirent, promises as fsPromises } from 'fs';
+import { move } from 'fs-extra';
 
 export class FileUtils {
   static async moveFile(
@@ -16,7 +17,6 @@ export class FileUtils {
 
   static async createTempUploadFolder(name: string) {
     try {
-      console.log(name);
       await fsPromises.access(name);
     } catch (error) {
       try {
@@ -36,6 +36,14 @@ export class FileUtils {
       await fsPromises.writeFile(destinationPath, fileContent);
     } catch (error) {
       throw new Error(`Error copying file: ${error.message}`);
+    }
+  }
+
+  static async moveDir(sourcePath: string, destinationPath: string) {
+    try {
+      await move(sourcePath, destinationPath);
+    } catch (err) {
+      console.error(`Error moving directory: ${err}`);
     }
   }
 

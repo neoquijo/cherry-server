@@ -8,10 +8,9 @@ export class BusinessOwnersService {
   constructor(
     @InjectModel(BusinessOwner.name)
     private readonly owners: Model<BusinessOwner>,
-  ) { }
+  ) {}
   async create(data) {
     try {
-      console.log(data);
       if (
         !data.displayName ||
         !data.password ||
@@ -80,7 +79,6 @@ export class BusinessOwnersService {
 
   async addPos(id, pos) {
     try {
-      console.log(pos);
       const response = await this.owners.updateOne(
         { id: id },
         { $push: { pointsOfSale: pos } },
@@ -112,7 +110,6 @@ export class BusinessOwnersService {
         { $or: [{ id }, { _id: id }] },
         { $pull: { pointsOfSale: pos } },
       );
-      console.log(response);
       return response;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.NOT_MODIFIED, {
