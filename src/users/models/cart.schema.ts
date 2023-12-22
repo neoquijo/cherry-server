@@ -8,7 +8,7 @@ export interface CartItem {
   caption: string;
   price: number;
   qty: number;
-  itemInfo?: [IOffer];
+  itemInfo?: IOffer;
 }
 
 export type CartDocument = Cart & Document;

@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Req,
   UploadedFiles,
   UseGuards,
@@ -22,6 +23,7 @@ import { MulterFile } from 'src/image-handler/types';
 import { OfferDTO } from './models/offer.dto';
 import { PointsOfSaleService } from 'src/pointsOfSale/pointsOfSale.service';
 import { FileUtils } from 'src/Utils/FileUtils';
+import { query } from 'express';
 
 @Controller('/admin/offers')
 @UseGuards(OwnerGuard)
@@ -30,6 +32,7 @@ export class AdminOffersController {
     private readonly offerService: OffersService,
     private readonly posService: PointsOfSaleService,
   ) { }
+
 
   @Get('/')
   async getAll(@Organizatios() organizations) {

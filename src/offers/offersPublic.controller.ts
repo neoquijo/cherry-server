@@ -4,15 +4,19 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  UseGuards,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { OffersService } from './offers.service';
-import { UserGuard } from 'src/auth/userAuth.guard';
-import { User } from 'src/auth/owner.decorator';
 
 @Controller('/offers')
 export class OffersPublicController {
   constructor(private readonly offers: OffersService) { }
+
+  @Get('/search')
+  async simpleSearch(@Query() query) {
+    return await this.offers.searchOfferQuery(query.lang, query.title);
+  }
 
   @Get('/cats')
   async getAllCats() {
@@ -37,9 +41,11 @@ export class OffersPublicController {
   }
 
   @Get('/')
-  async getAllActive() {
+  async getAllActive(@Query('lang') lang, @Req() req) {
     try {
-      const result = await this.offers.getAllActiveOffers();
+      console.log(lang);
+      console.dir(JSON.stringify(req.cookies));
+      const result = await this.offers.getAllActiveOffers(lang);
       return result;
     } catch (error) {
       throw new HttpException('Error fetching offers', HttpStatus.BAD_REQUEST, {

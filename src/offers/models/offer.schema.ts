@@ -2,6 +2,15 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { v4 } from 'uuid';
 
+export interface IBuyOption {
+  id: string;
+  title: string;
+  caption: string;
+  offerPrice: number;
+  description: string;
+  initialPrice: number;
+}
+
 @Schema()
 export class Offer {
   @Prop({ default: () => v4() })
@@ -61,7 +70,7 @@ export class Offer {
   @Prop({ default: false })
   verifyed: boolean;
   @Prop()
-  buyOptions: [unknown];
+  buyOptions: [IBuyOption];
 }
 
 export const OfferSchema = SchemaFactory.createForClass(Offer);

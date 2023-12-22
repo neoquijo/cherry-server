@@ -27,6 +27,10 @@ export class Users {
   emailVerified: boolean;
   @Prop({ type: Types.ObjectId, ref: 'cart' })
   cart: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'orders' })
+  orders: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'cupons' })
+  cupons: Types.ObjectId;
 }
 
 export interface IUser {

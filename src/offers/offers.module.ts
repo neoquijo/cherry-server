@@ -21,5 +21,6 @@ import { OfferCats, OfferCatsSchema } from './models/offerCats.schema';
     ]),
   ],
   controllers: [AdminOffersController, OffersPublicController],
+  exports: [OffersService],
 })
 export class OffersModule {}

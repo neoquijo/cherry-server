@@ -10,7 +10,7 @@ export class UsersService {
   constructor(
     @InjectModel(Users.name) private readonly users: Model<Users>,
     @InjectModel(Cart.name) private readonly cart: Model<Cart>,
-  ) { }
+  ) {}
   async createNew(user: ICreateUserDto) {
     const created = await this.users.create(user);
     await this.createUserCart(created._id);
@@ -57,6 +57,28 @@ export class UsersService {
     }
   }
 
+  async addOrder(userId: string, orderId: string) {
+    const user = await this.users.updateOne(
+      { _id: userId },
+      { $push: { orders: new Types.ObjectId(orderId) } },
+    );
+    return user;
+  }
+
+  async clearCart(cartId: string) {
+    try {
+      const response = await this.cart.findOneAndUpdate(
+        { _id: cartId },
+        { $set: { items: [] } },
+      );
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST, {
+        cause: error.message,
+      });
+    }
+  }
+
   async addToCart(items: CartItem[], cartId: string) {
     try {
       const cart = await this.cart.findById(cartId);
@@ -75,7 +97,7 @@ export class UsersService {
         if (existingItem) {
           existingItem.qty += newItem.qty;
         } else {
-          console.log(newItem.caption)
+          console.log(newItem.caption);
           newItem.id = new Types.ObjectId(newItem.id);
           cart.items.push(newItem);
         }
