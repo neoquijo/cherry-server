@@ -125,11 +125,12 @@ export class OffersService {
     return price;
   }
 
-  async getAllActiveOffersByCat(cat: string) {
+  async getAllActiveOffersByCat(lang: string, cat: string) {
     try {
       const now = new Date().getTime();
       const response = await this.offer.find({
         $and: [
+          { lang },
           { startsAt: { $lt: now } },
           { endsAt: { $gt: now } },
           { category: { $eq: cat } },
@@ -143,7 +144,7 @@ export class OffersService {
     }
   }
 
-  async getCats(key?: string) {
+  async getCats(lang, key?: string) {
     try {
       const aggregationPipeline = [
         ...(key ? [{ $match: { key: key } }] : []),
@@ -159,6 +160,7 @@ export class OffersService {
                       { $eq: ['$category', '$$catKey'] },
                       { $lt: ['$startsAt', new Date().getTime()] },
                       { $gt: ['$endsAt', new Date().getTime()] },
+                      { $eq: ['$lang', lang] },
                     ],
                   },
                 },

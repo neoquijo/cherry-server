@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 export class CreateOrderDto {
   createdAt: number;
-  user: Types.ObjectId;
+  user: Types.ObjectId | string;
   status: string;
   orderType: string;
   items: unknown;

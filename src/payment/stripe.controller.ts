@@ -4,7 +4,6 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Param,
   Post,
   Query,
   Req,
@@ -34,12 +33,13 @@ export class StripeController {
   async confirmStripe(@Req() req, @Res() res: Response, @Query() params) {
     try {
       console.log(params);
-      const { status, metadata } = await this.stripeService.getStripePayment(
-        params.payment_intent,
-      );
+      const { status, metadata, amount } =
+        await this.stripeService.getStripePayment(params.payment_intent);
       if (status === 'succeeded') {
         await this.orders.completeOrder(metadata.orderId);
-        res.redirect('http://localhost:3000/paymentSuccess');
+        res.redirect(
+          `http://localhost:3000/paymentSuccess?payment=${metadata.orderId}&amount=${amount}`,
+        );
       } else res.redirect('http://localhost:3000/rejectPayment');
     } catch (error) {
       console.log(error);

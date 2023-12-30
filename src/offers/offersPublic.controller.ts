@@ -19,8 +19,9 @@ export class OffersPublicController {
   }
 
   @Get('/cats')
-  async getAllCats() {
-    return await this.offers.getCats();
+  async getAllCats(@Query('lang') lang) {
+    console.log(lang);
+    return await this.offers.getCats(lang);
   }
 
   @Get('/get/:id')
@@ -29,9 +30,9 @@ export class OffersPublicController {
   }
 
   @Get('/:cat')
-  async getOffersByCat(@Param('cat') cat: string) {
+  async getOffersByCat(@Param('cat') cat: string, @Query('lang') lang: string) {
     try {
-      const result = await this.offers.getAllActiveOffersByCat(cat);
+      const result = await this.offers.getAllActiveOffersByCat(lang, cat);
       return result;
     } catch (error) {
       throw new HttpException('Error fetching offers', HttpStatus.BAD_REQUEST, {

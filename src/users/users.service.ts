@@ -10,7 +10,7 @@ export class UsersService {
   constructor(
     @InjectModel(Users.name) private readonly users: Model<Users>,
     @InjectModel(Cart.name) private readonly cart: Model<Cart>,
-  ) {}
+  ) { }
   async createNew(user: ICreateUserDto) {
     const created = await this.users.create(user);
     await this.createUserCart(created._id);
@@ -18,22 +18,24 @@ export class UsersService {
   }
   async findUserById(id: string) {
     try {
-      const result = await this.users
-        .findOne({
-          $or: [
-            {
-              id,
-            },
-            {
-              email: id,
-            },
-            {
-              phone: id,
-            },
-          ],
-        })
-        .lean();
-      return result;
+      if (id) {
+        const result = await this.users
+          .findOne({
+            $or: [
+              {
+                id,
+              },
+              {
+                email: id,
+              },
+              {
+                phone: id,
+              },
+            ],
+          })
+          .lean();
+        return result;
+      } else throw new Error('id is undefined');
     } catch (error) {
       throw new HttpException(
         'user lookup error',

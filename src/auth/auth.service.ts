@@ -75,10 +75,18 @@ export class AuthService {
         authProvider: 'local',
         avatar: data.photoURL,
         emailVerified: false,
+        phone: data.phoneNumber,
         login: data.email,
         password: bcrypt.hashSync(data.password, 10),
       });
-      return response;
+      //@ts-ignore
+      const token = await this.createToken(response._doc);
+      console.log(response);
+      console.log(token);
+      return {
+        user: response,
+        token,
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.CONFLICT, {
         cause: error.message,
@@ -134,23 +142,29 @@ export class AuthService {
   }
 
   async login({ login, password }) {
-    const candidate = await this.users.findUserById(login);
-    if (!candidate)
-      throw new HttpException(
-        'Такого пользователя не существует!',
-        HttpStatus.BAD_REQUEST,
-      );
-    else {
-      const correct = await bcrypt.compare(password, candidate.password);
-      if (!correct)
+    try {
+      const candidate = await this.users.findUserById(login);
+      if (!candidate)
         throw new HttpException(
-          'Не верно указан пароль!',
-          HttpStatus.UNAUTHORIZED,
+          'Такого пользователя не существует!',
+          HttpStatus.BAD_REQUEST,
         );
       else {
-        const { password, ...user } = candidate;
-        return this.createToken(user);
+        const correct = await bcrypt.compare(password, candidate.password);
+        if (!correct)
+          throw new HttpException(
+            'Не верно указан пароль!',
+            HttpStatus.UNAUTHORIZED,
+          );
+        else {
+          const { password, ...user } = candidate;
+          return this.createToken(user);
+        }
       }
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED, {
+        cause: error.message,
+      });
     }
   }
 
@@ -207,6 +221,8 @@ export class AuthService {
         const decoded = this.jwt.decode(token);
         if (typeof decoded === 'object') {
           const user: IUser = decoded as IUser;
+          console.log('userId:' + user.id);
+          console.log(user);
           const exist = await this.users.findUserById(user.id);
           if (!exist) throw new Error('token validation failed');
           return exist;

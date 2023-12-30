@@ -39,6 +39,30 @@ export class OrdersService {
     }
   }
 
+  async getUserOrder(userId: string, id: string) {
+    try {
+      const response = await this.orders
+        .findOne({ user: userId, _id: id })
+        .populate('issuedCupons')
+        .lean();
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async deliverOrder(orderId) {
+    try {
+      this.orders.findOne({})
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST, {
+        cause: error.message,
+      });
+    }
+  }
+
   async completeOrder(orderId) {
     try {
       const order = await this.orders.findById(orderId);

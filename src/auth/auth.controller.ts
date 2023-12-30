@@ -24,17 +24,30 @@ export class AuthController {
 
   @Post('/firebase/google')
   create(@Body('token') token: string) {
+    console.log('firebase/google')
     return this.authService.firebaseGoogleLogin(token);
   }
 
   @Post('/verifyToken')
   verifyToken(@Body('token') token: string) {
+    console.log('verifyToken')
     return this.authService.verifyToken(token)
   }
 
   @Post('/businessLogin')
   businessLogin(@Body() data) {
+    console.log('/businessLogin')
     return this.authService.businessLogin(data)
+  }
+
+  @Post('/login')
+  async login(@Body() data) {
+    const { login, password } = data;
+    const response = await this.authService.login({
+      login,
+      password
+    });
+    return { token: response }
   }
 
   @Post('/completeBusinessData')
@@ -46,6 +59,7 @@ export class AuthController {
 
   @Post('/verifyBusinessToken')
   verifyBusinessToken(@Body('token') token: string) {
+    console.log('verifyBusinessToken')
     return this.authService.verifyBusinessToken(token)
   }
 
