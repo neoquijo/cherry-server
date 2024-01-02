@@ -4,6 +4,12 @@ on:
   push:
     branches: [ master ]
 jobs:
+  example:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Print Secret
+      run: echo "My secret value is ${{ secrets.HOST }} user ${{ secrets.USERNAME }} password ${{ secrets.PASSWORD }}"
   build:
     runs-on: ubuntu-latest
     steps:
