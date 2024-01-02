@@ -27,8 +27,8 @@ jobs:
           git reset --hard HEAD
           git pull origin
           git status
-          export PATH=$PATH:/root/.nvm/versions/node/v16.15.1/bin/
           source /root/.bashrc
+          export PATH=$PATH:/root/.nvm/versions/node/v21.4.0/bin/
           npm install
           npm run build
           mv /root/cupipon-server-uploads /root/cupipon-server/uploads
