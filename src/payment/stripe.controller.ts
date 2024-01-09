@@ -38,9 +38,9 @@ export class StripeController {
       if (status === 'succeeded') {
         await this.orders.completeOrder(metadata.orderId);
         res.redirect(
-          `http://localhost:3000/paymentSuccess?payment=${metadata.orderId}&amount=${amount}`,
+          `https://cupipon.com/paymentSuccess?payment=${metadata.orderId}&amount=${amount}`,
         );
-      } else res.redirect('http://localhost:3000/rejectPayment');
+      } else res.redirect('https://cupipon.com/rejectPayment');
     } catch (error) {
       console.log(error);
       throw new HttpException(error.message, HttpStatus.PAYMENT_REQUIRED, {
