@@ -22,7 +22,8 @@ jobs:
         port: 22
         script: |
           cd /root/cupipon-server
-          mv uploads ../cupipon-server-uploads
+          mkdir /root/tempUploads
+          mv uploads/* ../tempUploads/
           git fetch origin
           git reset --hard HEAD
           git pull origin
@@ -31,5 +32,6 @@ jobs:
           export PATH=$PATH:/root/.nvm/versions/node/v21.4.0/bin/
           npm install
           npm run build
-          mv /root/cupipon-server-uploads /root/cupipon-server/uploads
+          mv /root/tempUploads/* /root/cupipon-server/uploads
+          rm -r /root/tempUploads
           pm2 restart 0
