@@ -31,7 +31,7 @@ export class OffersService {
   async getFreshOffers(lang: string) {
     try {
       const now = new Date().getTime();
-      const twoDaysAgo = now - 4 * 24 * 60 * 60 * 1000; // Two days in milliseconds
+      const twoDaysAgo = now - 2 * 24 * 60 * 60 * 1000; // Two days in milliseconds
       const response = await this.offer.find({
         $and: [
           { lang, startsAt: { $gt: twoDaysAgo, $lt: now } },
