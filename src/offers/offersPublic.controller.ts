@@ -18,6 +18,14 @@ export class OffersPublicController {
     return await this.offers.searchOfferQuery(query.lang, query.title);
   }
 
+  @Get('/freshOffers')
+  async getFreshOffers(@Query('lang') lang) {
+    console.log('algo')
+    const response = await this.offers.getFreshOffers(lang);
+    return response;
+  }
+
+
   @Get('/cats')
   async getAllCats(@Query('lang') lang) {
     console.log(lang);
@@ -40,6 +48,7 @@ export class OffersPublicController {
       });
     }
   }
+
 
   @Get('/')
   async getAllActive(@Query('lang') lang, @Req() req) {
