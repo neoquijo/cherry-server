@@ -13,6 +13,7 @@ import { OffersService } from './offers.service';
 export class OffersPublicController {
   constructor(private readonly offers: OffersService) { }
 
+
   @Get('/search')
   async simpleSearch(@Query() query) {
     return await this.offers.searchOfferQuery(query.lang, query.title);
