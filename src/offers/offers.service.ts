@@ -49,7 +49,13 @@ export class OffersService {
 
   async searchOfferQuery(lang: string, query: string) {
     try {
+      const now = new Date().getTime();
       const results = await this.offer.find({
+        $and: [
+          { lang, startsAt: { $lt: now } },
+          { endsAt: { $gt: now } },
+          // You can include other conditions if needed
+        ],
         $or: [
           {
             lang,
@@ -60,6 +66,7 @@ export class OffersService {
             description: { $regex: query, $options: 'i' },
           },
         ],
+
       });
       return results;
     } catch (error) {
