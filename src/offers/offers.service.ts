@@ -20,7 +20,7 @@ export class OffersService {
       const response = await this.offer.find({
         $and: [{ startsAt: { $lt: now }, lang }, { endsAt: { $gt: now } }],
       });
-      return response;
+      return response.reverse();
     } catch (error) {
       throw new HttpException('Error getting offers', HttpStatus.NO_CONTENT, {
         cause: error.message,
@@ -39,7 +39,7 @@ export class OffersService {
           // You can include other conditions if needed
         ],
       });
-      return response;
+      return response.reverse();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST, {
         cause: error.message,
