@@ -78,7 +78,7 @@ export class OffersService {
     }
   }
 
-  async getAllOffersById(id: string) {
+  async getAllOffersById(id: string | Types.ObjectId) {
     try {
       const now = new Date().getTime();
       const response = await this.offer.find({

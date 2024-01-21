@@ -72,8 +72,9 @@ export class OrdersService {
       }
       await Promise.all(
         order.items.map(async (el) => {
+          console.log(el.id);
           const item = await this.offers.getOfferById(String(el.id));
-          const allItems = await this.offers.getAllOffersById(String(el.id));
+          const allItems = await this.offers.getAllOffersById(el.id);
           console.log(allItems);
           for (const singleItem of allItems) {
             await this.offers.incrementSalesOf(singleItem.id, el.qty);
