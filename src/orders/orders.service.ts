@@ -74,6 +74,7 @@ export class OrdersService {
         order.items.map(async (el) => {
           const item = await this.offers.getOfferById(String(el.id));
           const allItems = await this.offers.getAllOffersById(String(el.id));
+          console.log(allItems);
           for (const singleItem of allItems) {
             await this.offers.incrementSalesOf(singleItem.id, el.qty);
           }

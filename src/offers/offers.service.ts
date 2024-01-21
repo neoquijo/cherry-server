@@ -81,12 +81,13 @@ export class OffersService {
   async getAllOffersById(id: string) {
     try {
       const now = new Date().getTime();
+      const objectId = new Types.ObjectId(id)
       const response = await this.offer.find({
         $and: [
           {
             $or: [
               { id: id }, // Assuming "id" is a field in your offer model
-              { _id: id },
+              { _id: objectId },
             ],
           },
           { startsAt: { $lt: now } },
