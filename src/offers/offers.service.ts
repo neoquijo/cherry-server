@@ -84,7 +84,7 @@ export class OffersService {
       const response = await this.offer.find({
         $and: [
           {
-            $or: [{ _id: new mongoose.Types.ObjectId(id) }, { id: id }],
+            $or: [{ _id: `ObjectId('${id}')` }, { id: id }],
           },
           { startsAt: { $lt: now } },
           { endsAt: { $gt: now } },
