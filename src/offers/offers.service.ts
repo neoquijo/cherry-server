@@ -21,7 +21,11 @@ export class OffersService {
     try {
       const now = new Date().getTime();
       const response = await this.offer.find({
-        $and: [{ startsAt: { $lt: now }, lang }, { endsAt: { $gt: now } }],
+        $and: [
+          { startsAt: { $lt: now }, lang },
+          { endsAt: { $gt: now } },
+          { qty: { $gt: '$totalSold' } },
+        ],
       });
       return response.reverse();
     } catch (error) {

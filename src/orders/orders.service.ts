@@ -55,7 +55,7 @@ export class OrdersService {
 
   async deliverOrder(orderId) {
     try {
-      this.orders.findOne({})
+      this.orders.findOne({});
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST, {
         cause: error.message,
@@ -74,8 +74,9 @@ export class OrdersService {
         order.items.map(async (el) => {
           console.log(el.id);
           const item = await this.offers.getOfferById(String(el.id));
-          const allItems = await this.offers.getAllOffersById(el.id);
-          console.log(allItems);
+          const allItems = await this.offers.getAllOffersById(
+            item.isTranslation ? item.id : item._id,
+          );
           for (const singleItem of allItems) {
             await this.offers.incrementSalesOf(singleItem.id, el.qty);
           }
@@ -99,6 +100,7 @@ export class OrdersService {
       order.status = 'complete';
       await order.save();
     } catch (error) {
+      console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST, {
         cause: error.message,
       });

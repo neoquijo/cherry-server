@@ -54,6 +54,8 @@ export class Offer {
   @Prop()
   pageContent: [unknown];
   @Prop()
+  isTranslation: boolean;
+  @Prop()
   currentActivations: number;
   @Prop({ type: Types.ObjectId, ref: 'organization' })
   organization: Types.ObjectId;
