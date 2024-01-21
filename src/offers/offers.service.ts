@@ -24,7 +24,7 @@ export class OffersService {
         $and: [
           { startsAt: { $lt: now }, lang },
           { endsAt: { $gt: now } },
-          { qty: { $gt: '$totalSold' } },
+          // { qty: { $gt: '$totalSold' } },
         ],
       });
       return response.reverse();
