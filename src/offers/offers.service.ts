@@ -84,7 +84,7 @@ export class OffersService {
       const response = await this.offer.find({
         $and: [
           {
-            $or: [{ _id: `ObjectId('${id}')` }, { id: id }],
+            $or: [{ _id: id }, { id: id }],
           },
           { startsAt: { $lt: now } },
           { endsAt: { $gt: now } },
