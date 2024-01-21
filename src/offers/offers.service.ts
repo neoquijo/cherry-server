@@ -109,8 +109,11 @@ export class OffersService {
   async getOfferByRegexp(id: string, lang: string) {
     try {
       const offer = await this.offer
-        .findOne({ id: { $regex: id }, lang })
+        .findOne({ id: { $regex: id }, lang: lang || 'ru' })
         .lean();
+      console.log('id: ' + id);
+      console.log('offer: ' + offer);
+      console.log('lang: ' + lang);
       return offer;
     } catch (error) {
       throw new HttpException('Error getting offer', HttpStatus.BAD_REQUEST, {

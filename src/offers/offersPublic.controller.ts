@@ -35,6 +35,7 @@ export class OffersPublicController {
 
   @Get('/get/:id')
   async getOfferById(@Param('id') id, @Query('lang') lang) {
+    console.log('controllerLang: ' + lang)
     return await this.offers.getOfferByRegexp(id, lang || 'ru');
   }
 
