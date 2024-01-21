@@ -3,13 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { POS } from './models/pointsOfSale.schema';
 import { Model, Types } from 'mongoose';
 import { ImageHandlerService } from 'src/image-handler/image-handler.service';
+import { Organizations } from 'src/organizations/models/organization.schema';
 
 @Injectable()
 export class PointsOfSaleService {
   constructor(
     @InjectModel(POS.name) readonly posService: Model<POS>,
+    @InjectModel(Organizations.name)
+    readonly organizationService: Model<Organizations>,
     private readonly imageService: ImageHandlerService,
-  ) {}
+  ) { }
 
   getTempImage(): string {
     return 'lol';
@@ -18,6 +21,10 @@ export class PointsOfSaleService {
   async create(data, owner) {
     try {
       const response = await this.posService.create({ ...data, owner });
+      await this.organizationService.findByIdAndUpdate(
+        { owner: owner },
+        { $push: { pointsOfSale: response._id } },
+      );
       return response;
     } catch (error) {
       throw new HttpException(error, HttpStatus.NOT_ACCEPTABLE, {
