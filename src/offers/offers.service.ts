@@ -29,6 +29,7 @@ export class OffersService {
       });
       return response.reverse();
     } catch (error) {
+      console.log(error);
       throw new HttpException('Error getting offers', HttpStatus.NO_CONTENT, {
         cause: error.message,
       });
