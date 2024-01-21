@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Offer } from './models/offer.schema';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { FileUtils } from 'src/Utils/FileUtils';
 import { OfferDTO } from './models/offer.dto';
 import { OfferCats } from './models/offerCats.schema';
@@ -76,19 +76,15 @@ export class OffersService {
         cause: error.message,
       });
     }
-  };
+  }
 
   async getAllOffersById(id: string) {
     try {
       const now = new Date().getTime();
-      const objectId = new Types.ObjectId(id)
       const response = await this.offer.find({
         $and: [
           {
-            $or: [
-              { id: id }, // Assuming "id" is a field in your offer model
-              { _id: objectId },
-            ],
+            $or: [{ _id: new mongoose.Types.ObjectId(id) }, { id: id }],
           },
           { startsAt: { $lt: now } },
           { endsAt: { $gt: now } },
