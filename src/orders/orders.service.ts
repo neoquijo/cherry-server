@@ -73,7 +73,11 @@ export class OrdersService {
       await Promise.all(
         order.items.map(async (el) => {
           const item = await this.offers.getOfferById(String(el.id));
-          this.offers.incrementSalesOf(item.id, el.qty);
+          const allItems = await this.offers.getAllOffersById(String(el.id));
+          for (const singleItem of allItems) {
+            await this.offers.incrementSalesOf(singleItem.id, el.qty);
+          }
+          // this.offers.incrementSalesOf(item.id, el.qty);
           for (let i = 0; i < el.qty; i++) {
             const cupon = await this.cupons.createCupon({
               caption: item.title,

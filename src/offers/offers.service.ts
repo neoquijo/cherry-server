@@ -76,6 +76,29 @@ export class OffersService {
         cause: error.message,
       });
     }
+  };
+
+  async getAllOffersById(id: string) {
+    try {
+      const now = new Date().getTime();
+      const response = await this.offer.find({
+        $and: [
+          {
+            $or: [
+              { id: id }, // Assuming "id" is a field in your offer model
+              { _id: id },
+            ],
+          },
+          { startsAt: { $lt: now } },
+          { endsAt: { $gt: now } },
+        ],
+      });
+      return response;
+    } catch (error) {
+      throw new HttpException('Error getting offers', HttpStatus.NO_CONTENT, {
+        cause: error.message,
+      });
+    }
   }
 
   async getOfferById(id: string) {
