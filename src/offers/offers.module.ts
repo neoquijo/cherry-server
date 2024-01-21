@@ -8,6 +8,7 @@ import { OffersService } from './offers.service';
 import { PointsOfSaleModule } from 'src/pointsOfSale/pointsOfSale.module';
 import { OffersPublicController } from './offersPublic.controller';
 import { OfferCats, OfferCatsSchema } from './models/offerCats.schema';
+import { POS, POSSchema } from 'src/pointsOfSale/models/pointsOfSale.schema';
 
 @Module({
   providers: [OffersService],
@@ -18,9 +19,10 @@ import { OfferCats, OfferCatsSchema } from './models/offerCats.schema';
     MongooseModule.forFeature([
       { name: Offer.name, schema: OfferSchema },
       { name: OfferCats.name, schema: OfferCatsSchema },
+      { name: POS.name, schema: POSSchema },
     ]),
   ],
   controllers: [AdminOffersController, OffersPublicController],
   exports: [OffersService],
 })
-export class OffersModule {}
+export class OffersModule { }

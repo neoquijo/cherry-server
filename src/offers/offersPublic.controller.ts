@@ -34,8 +34,8 @@ export class OffersPublicController {
   }
 
   @Get('/get/:id')
-  async getOfferById(@Param('id') id) {
-    return await this.offers.getOfferByRegexp(id, 'ru');
+  async getOfferById(@Param('id') id, @Query('lang') lang) {
+    return await this.offers.getOfferByRegexp(id, lang || 'ru');
   }
 
   @Get('/:cat')

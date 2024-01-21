@@ -8,7 +8,10 @@ import { PointsOfSaleService } from './pointsOfSale.service';
 import { BusinessOwnersModule } from 'src/businessOwners/businessOwners.module';
 import { PosAdress, PosAdressSchema } from './models/posadress.schema';
 import { OrganizationsModule } from 'src/organizations/organizations.module';
-import { Organizations, OrganizationsSchema } from 'src/organizations/models/organization.schema';
+import {
+  Organizations,
+  OrganizationsSchema,
+} from 'src/organizations/models/organization.schema';
 
 @Module({
   providers: [PointsOfSaleService],

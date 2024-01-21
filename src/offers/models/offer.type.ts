@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface IOffer {
+  _id: Types.ObjectId;
   id: string;
   title: string;
   lang: string;
@@ -8,7 +9,7 @@ export interface IOffer {
   startsAt: number;
   endsAt: number;
   category: string;
-  availableIn: Types.ObjectId[];
+  avaliableIn: Types.ObjectId[];
   homeDeliveryIn: Types.ObjectId[];
   qty: number;
   unlimited: boolean;

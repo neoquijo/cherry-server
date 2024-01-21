@@ -21,12 +21,14 @@ export class PointsOfSaleService {
   async create(data, owner) {
     try {
       const response = await this.posService.create({ ...data, owner });
-      await this.organizationService.findByIdAndUpdate(
-        { owner: owner },
-        { $push: { pointsOfSale: response._id } },
+      console.log(`owner: ${owner}`);
+      await this.organizationService.findOneAndUpdate(
+        { owner: new Types.ObjectId(owner) },
+        { $push: { pointsOfSale: new Types.ObjectId(response._id) } },
       );
       return response;
     } catch (error) {
+      console.log(error)
       throw new HttpException(error, HttpStatus.NOT_ACCEPTABLE, {
         cause: error?.message,
       });

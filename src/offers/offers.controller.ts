@@ -23,6 +23,7 @@ import { OfferDTO } from './models/offer.dto';
 import { PointsOfSaleService } from 'src/pointsOfSale/pointsOfSale.service';
 import { FileUtils } from 'src/Utils/FileUtils';
 import { query } from 'express';
+import { Types } from 'mongoose';
 
 @Controller('/admin/offers')
 @UseGuards(OwnerGuard)
@@ -40,16 +41,27 @@ export class AdminOffersController {
     );
   }
 
+  @Post('/update')
+  async updateOffer(@Body() offer, @User() user) {
+    const updatedOffer = await this.offerService.updateOffer(offer, user._id)
+    return updatedOffer
+  }
 
+  @Post('/delete')
+  async deleteOffer(@Body() offer, @User() user) {
+    const response = await this.offerService.deleteOffer(offer, user._id)
+    return response
+  }
 
   @Post('/create')
   async createOffer(@Body() offer: OfferDTO, @User() user) {
+
     const createdOffer = await this.offerService.create(
       offer,
       user._id,
       user.organizations[0]._id,
     );
-    this.posService.addHomeDeliveryToPos(
+    await this.posService.addHomeDeliveryToPos(
       createdOffer._id,
       createdOffer.homeDeliveryIn,
     );

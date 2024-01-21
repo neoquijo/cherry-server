@@ -6,12 +6,15 @@ import { FileUtils } from 'src/Utils/FileUtils';
 import { OfferDTO } from './models/offer.dto';
 import { OfferCats } from './models/offerCats.schema';
 import { CartItem } from 'src/users/models/cart.schema';
+import { POS } from 'src/pointsOfSale/models/pointsOfSale.schema';
+import { IOffer } from './models/offer.type';
 
 @Injectable()
 export class OffersService {
   constructor(
     @InjectModel(Offer.name) private readonly offer: Model<Offer>,
     @InjectModel(OfferCats.name) private readonly cats: Model<OfferCats>,
+    @InjectModel(POS.name) private readonly POS: Model<POS>,
   ) { }
   i = 0;
   async getAllActiveOffers(lang: string) {
@@ -66,7 +69,6 @@ export class OffersService {
             description: { $regex: query, $options: 'i' },
           },
         ],
-
       });
       return results;
     } catch (error) {
@@ -227,7 +229,57 @@ export class OffersService {
     }
   }
 
+  async updateOffer(offer, ownerId: string) {
+    try {
+      const { organization, owner, ...newOffer } = offer;
+      console.log(organization, owner);
+      const response = await this.offer.findOneAndUpdate(
+        { _id: offer._id, owner: ownerId },
+        newOffer,
+        { new: true },
+      );
+      console.log(newOffer);
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Offer creation error', HttpStatus.NO_CONTENT, {
+        cause: error.message,
+      });
+    }
+  }
+
+  async deleteOffer(offer: IOffer, ownerId) {
+    try {
+      const response = await this.offer.findOneAndDelete({
+        _id: offer._id,
+        owner: ownerId,
+      });
+      if (offer.avaliableIn?.length > 0) {
+      }
+      for (const el of offer.avaliableIn) {
+        await this.POS.findOneAndUpdate(
+          { _id: el },
+          { $pull: { offers: offer._id } },
+        );
+      }
+      if (offer.homeDeliveryIn?.length > 0)
+        for (const el of offer.homeDeliveryIn) {
+          await this.POS.findOneAndUpdate(
+            { _id: el },
+            { $pull: { homeDeliveryOffers: offer._id } },
+          );
+        }
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Offer creation error', HttpStatus.NO_CONTENT, {
+        cause: error.message,
+      });
+    }
+  }
+
   async create(offer: OfferDTO, ownerId: string, organization?: string) {
+    console.log(offer);
     try {
       const response = await this.offer.create({
         ...offer,
@@ -240,8 +292,10 @@ export class OffersService {
           ? new Types.ObjectId(organization)
           : undefined,
       });
+      console.log(response);
       return response;
     } catch (error) {
+      console.log(error);
       throw new HttpException('Offer creation error', HttpStatus.NO_CONTENT, {
         cause: error.message,
       });
