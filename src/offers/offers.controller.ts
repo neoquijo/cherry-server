@@ -66,12 +66,12 @@ export class AdminOffersController {
       createdOffer.homeDeliveryIn,
     );
     await FileUtils.moveDir(
-      'uploads/offers/' + user.id.slice(-10),
-      'uploads/offerCards/' + createdOffer.id.slice(-10),
+      'uploads/offers/' + user._id.slice(-10),
+      'uploads/offerCards/' + String(createdOffer._id).slice(-10),
     );
     await FileUtils.copyFile(
       'uploads/offerCards/' +
-      createdOffer.id.slice(-10) +
+      String(createdOffer._id).slice(-10) +
       '/' +
       createdOffer.mainImage,
       'uploads/covers/' + createdOffer.mainImage,
