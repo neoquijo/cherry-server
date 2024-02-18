@@ -26,6 +26,10 @@ export class OffersService {
           { endsAt: { $gt: now } },
           // { qty: { $gt: '$totalSold' } },
         ],
+        $or: [
+          { unlimited: true }, // Return documents without checking totalSold < qty if unlimited is true
+          { $expr: { $lt: ['$totalSold', '$qty'] } }, // Check totalSold < qty if unlimited is false
+        ],
       });
       return response.reverse();
     } catch (error) {
